@@ -40,5 +40,5 @@ new_ver = specified_ver_nums.join('.')
 `git push origin master`
 `git tag #{new_ver}`
 `git push origin #{new_ver}`
-`gem build elos.gemspec`
-puts `gem push elos-#{new_ver}.gem 2>&1`
+`gem build redis-lockex.gemspec`
+puts `gem push redis-lockex-#{new_ver}.gem 2>&1`

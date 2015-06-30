@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'redis-lockex'
-  s.version = '0.0.2'
+  s.version = '0.0.3'
   s.authors = ['Tetsuri Moriya']
   s.email = ['tetsuri.moriya@gmail.com']
   s.summary = 'Redis lock extension'

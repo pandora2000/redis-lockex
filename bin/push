@@ -34,6 +34,7 @@ later_version!(specified_ver_nums, current_ver_nums)
 
 new_ver = specified_ver_nums.join('.')
 `sed -i -e 's/version = '"'"'#{current_ver}'"'"'/version = '"'"'#{new_ver}'"'"'/g' #{path}/*.gemspec`
+`bundle install`
 `git add --all`
 `git commit -m 'version #{new_ver}'`
 `git push origin master`

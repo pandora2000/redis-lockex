@@ -1,0 +1,43 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+
+def version_numbers(version)
+  ver_nums = version.split('.').map(&:to_i)
+  fail 'Invalid version format!' unless ver_nums.length == 3
+  ver_nums
+end
+
+def later_version!(ver_nums1, ver_nums2)
+  ver_nums1 = version_numbers(ver_nums1) if ver_nums1.is_a?(String)
+  ver_nums2 = version_numbers(ver_nums2) if ver_nums2.is_a?(String)
+  [ver_nums1, ver_nums2].transpose.each do |ver_num1, ver_num2|
+    return if ver_num1 > ver_num2
+    fail 'Not later version!' if ver_num1 < ver_num2
+  end
+  fail 'Not later version!'
+end
+
+path = File.expand_path('../..', __FILE__)
+
+specified_ver_nums = version_numbers(ARGV[0]) if ARGV.length > 0
+current_ver = `cat redis-lockex.gemspec | grep 'version =' | awk '{ print $3 }'`.strip.gsub("'", '')
+current_ver_nums = version_numbers(current_ver)
+specified_ver_nums ||=
+  begin
+    r = current_ver_nums.dup
+    r[2] = r[2] + 1
+    r
+  end
+
+later_version!(specified_ver_nums, current_ver_nums)
+
+new_ver = specified_ver_nums.join('.')
+`sed -i -e 's/version = '"'"'#{current_ver}'"'"'/version = '"'"'#{new_ver}'"'"'/g' #{path}/*.gemspec`
+`git add --all`
+`git commit -m 'version #{new_ver}'`
+`git push origin master`
+`git tag #{new_ver}`
+`git push origin #{new_ver}`
+`gem build elos.gemspec`
+puts `gem push elos-#{new_ver}.gem 2>&1`

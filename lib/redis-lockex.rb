@@ -28,6 +28,11 @@ class Redis
     del(k)
   end
 
+  def locked?(key)
+    k = lock_key(key)
+    exists(k)
+  end
+
   private
 
   def lock_key(key)

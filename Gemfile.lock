@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    redis-lockex (0.0.4)
+    redis-lockex (0.0.5)
       activesupport (>= 4)
       redis
 

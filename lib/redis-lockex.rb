@@ -1,24 +1,17 @@
 require_relative 'initialize'
 
 class Redis
-  def lock(options, &proc)
-    key = options.is_a?(String) ? options : extract_option(options, :key)
-    interval = extract_option(options, :interval, 1)
-    block = extract_option(options, :block, true)
-    proc ||= extract_option(options, :proc)
-    locked = extract_option(options, :locked, -> {})
-    unlocked = extract_option(options, :unlocked, -> {})
-    expire = extract_option(options, :expire, nil)
+  def lock(arg_key = nil, key: nil, interval: 1, block: true, proc: nil, locked: -> {}, unlocked: -> {}, expire: nil, &arg_proc)
+    key ||= arg_key
+    proc ||= arg_proc
     k = lock_key(key)
     if block
       sleep(interval) until lock_core(k, expire)
     else
-      unless lock_core(k, expire)
-        return false
-      end
+      return false unless lock_core(k, expire)
     end
-    locked.call
     if proc
+      locked.call
       begin
         proc.call
       ensure
@@ -43,13 +36,5 @@ class Redis
 
   def lock_core(key, expire)
     set(key, '', nx: true, ex: expire)
-  end
-
-  def extract_option(options, key, default = nil)
-    if options.is_a?(Hash) && options.key?(key)
-      options.delete(key)
-    else
-      default
-    end
   end
 end
